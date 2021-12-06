@@ -36,6 +36,18 @@ services:
             timeout: 30s
             retries: 3
 
+    streamlit:
+        build:
+            dockerfile: ./Dockerfile.streamlite
+            context: ./
+        ports:
+            - "8501:8501"
+        volumes:
+            - './project:/usr/src/app/project:delegated'
+        environment:
+            - USER_ID=1000
+            - GROUP_ID=1000
+
     db:
         image: mysql:5.7
         volumes:
@@ -43,9 +55,9 @@ services:
             - ./script/schema.sql:/docker-entrypoint-initdb.d/1.sql
         restart: always
         ports:
-            - 3306:3306
+            - 3307:3306
         environment:
-            MYSQL_ROOT_PASSWORD: test123
-            MYSQL_DATABASE: test
-            MYSQL_USER: test
-            MYSQL_PASSWORD: test123
+            MYSQL_ROOT_PASSWORD: admin123
+            MYSQL_DATABASE: db_covid
+            MYSQL_USER: admin
+            MYSQL_PASSWORD: admin123
