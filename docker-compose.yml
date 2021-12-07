@@ -48,11 +48,20 @@ services:
             - USER_ID=1000
             - GROUP_ID=1000
 
+    fastapi:
+        build:
+            dockerfile: ./Dockerfile.fastapi
+            context: ./
+        ports:
+            - "8585:8585"
+        volumes:
+            - ./storage:/storage
+
     db:
         image: mysql:5.7
         volumes:
             #- ./db_data:/var/lib/mysql
-            - ./script/schema.sql:/docker-entrypoint-initdb.d/1.sql
+            - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
         restart: always
         ports:
             - 3307:3306
