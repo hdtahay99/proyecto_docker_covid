@@ -15,7 +15,7 @@ def get_covid_filter(skip = 0, limit = 100, status = 'Deaths'):
     response = requests.get(url = f"http://fastapi:8585/covid/values/filter?skip={skip}&limit={limit}&status={status}")
     return response.json()
 
-df = pd.DataFrame.from_records(get_covid_filter())
+df = pd.DataFrame.from_records(get_covid_filter(skip=100, limit = 100, status = 'Confirmed'))
 df
 
 

@@ -104,7 +104,6 @@ def sensor_data(**kwargs):
 
         logger.info(f'Records inserted {len(df.index)} --- {file}')
         os.remove(file_path+file)
-        os.remove(file_path)
 
 
 
