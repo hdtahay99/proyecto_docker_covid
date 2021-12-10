@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 import pandas as pd
 from datetime import date
+import plotly.express as px
 
 
 """
@@ -25,8 +26,31 @@ def get_covid_filter2(date_from: date,date_to: date, status: str = 'Deaths'):
     response = requests.get(url = f"http://fastapi:8585/covid/values/test2?date_from={date_from}&date_to={date_to}&status={status}")
     return response.json()
 
-df = pd.DataFrame.from_records(get_covid_filter2(fecha1, fecha2, 'Deaths'))
-df
+### Capturando datos
+df_muertes = pd.DataFrame.from_records(get_covid_filter2(fecha1, fecha2, 'Deaths'))
+
+
+col_map_confirmed, col_map_deaths, col_map_recovered = st.columns(3)
+
+with col_map_confirmed:
+    st.header('Casos Confirmados')
+
+    fig_mapa_death = px.scatter_geo(
+        df_muertes,
+        lati='lat',
+        long='lon',
+        size='value',
+        hover_name='country_region',
+        projection='natural earth'
+    )
+
+    st.plotly_chart(fig_mapa_death, use_container_width=True)
+
+
+### Generando esquema de dashboard
+
+
+
 
 
 
