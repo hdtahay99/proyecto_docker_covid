@@ -1,16 +1,21 @@
 import streamlit as st
 import requests
 import pandas as pd
-from datetime import date
+from datetime import date, datetime
 import plotly.express as px
+import plotly.graph_objects as go
 
 
 """
 ## Ejemplo de lectura de base de datos con FastApi
 """
 
-fecha1 = st.sidebar.date_input("Fecha inicial", date.today())
-fecha2 = st.sidebar.date_input("Fecha final", date.today())
+fecha1 = st.sidebar.date_input("Fecha inicial",
+                               date(2021, 3, 1)
+                               )
+fecha2 = st.sidebar.date_input("Fecha final",
+                               date(2021, 3, 21)
+                               )
 
 
 
@@ -27,30 +32,14 @@ def get_covid_filter2(date_from: date,date_to: date, status: str = 'Deaths'):
     return response.json()
 
 ### Capturando datos
-df_muertes = pd.DataFrame.from_records(get_covid_filter2(fecha1, fecha2, 'Deaths'))
+df_muertes = pd.DataFrame.from_records(get_covid_filter2(fecha1, fecha2, 'Deaths')).reset_index()
 
 
-col_map_confirmed, col_map_deaths, col_map_recovered = st.columns(3)
+df_muertes =df_muertes.groupby(by=['country_region']).sum().reset_index()
 
-with col_map_confirmed:
-    st.header('Casos Confirmados')
+fig = px.scatter_geo(df_muertes, locations="country_region", size="value",)
 
-    fig_mapa_death = px.scatter_geo(
-        df_muertes,
-        lati='lat',
-        long='lon',
-        size='value',
-        hover_name='country_region',
-        projection='natural earth'
-    )
-
-    st.plotly_chart(fig_mapa_death, use_container_width=True)
-
-
-### Generando esquema de dashboard
-
-
-
+st.plotly_chart(fig, use_container_width=True)
 
 
 
