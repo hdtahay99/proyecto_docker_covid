@@ -15,9 +15,9 @@ fecha1 = st.sidebar.date_input("Fecha inicial",
                                date(2021, 3, 1)
                                )
 fecha2 = st.sidebar.date_input("Fecha final",
-                               date(2021, 3, 21)
+                               date(2021, 6, 30)
                                )
-components.html("<center> <h1>COVID 19 en el mundo</h1></center><br><center><h3>Casos acumulados entre el "+ str(fecha1)  +" y el "+ str(fecha2) +"</h3></center>")
+components.html("<center> <h1>COVID 19 en el mundo</h1></center><br><center><b>Casos acumulados entre el "+ str(fecha1)  +" y el "+ str(fecha2) +"</b></center>")
 
 
 def get_covid_values(skip = 0, limit = 100):
@@ -76,13 +76,14 @@ df_confirmed_acum['Text'] =  "Pais: " + df_confirmed_acum['country_region'] + \
 #### Recuperados
 df_recovered_acum =df_recovered.groupby(by=['country_region','province_state','lat','lon']).sum().reset_index()
 
-df_recovered_acum
+
 
 df_recovered_acum['Text'] =  "<b>Pais</b>: " + df_recovered_acum['country_region'] + \
                             "<br><b>Estado</b>: " + df_recovered_acum['province_state'] + \
                            '<br><b>Casos recuperados</b>:' + (df_recovered_acum['value']).astype(str)
 
-### Mapa acumuladas del filtro
+### Mapa acumuladas del filtro ###
+
 def mapa_acumulado_filtro(df, scale=100, color='#ff0000'):
     fig = go.Figure(go.Scattergeo())
     fig.add_trace(go.Scattergeo(
@@ -117,6 +118,36 @@ map_acum_confirmed = mapa_acumulado_filtro(df_confirmed_acum, scale = 1000, colo
 map_acum_recovered = mapa_acumulado_filtro(df_recovered_acum, scale = 1000, color = '#338BFF')
 map_acum_deaths = mapa_acumulado_filtro(df_muertes_acum, scale = 10, color = '#FF3333')
 
+
+def line_cases(df, status ='Casos'):
+    fig = go.Figure()
+
+    for country_region, group in df.groupby("country_region"):
+        fig.add_trace(go.Scatter(
+            x = group['date'],
+            y = group['value'],
+            mode = 'lines',
+            name = country_region
+        ))
+
+    fig.update_layout(
+        paper_bgcolor = '#F3F5F9',
+        plot_bgcolor='rgba(0,0,0,0)',
+        title_text=status, title_x=0.5, title_font_size=24,
+        xaxis_title="Fecha",
+        yaxis_title="Casos",
+        xaxis_tickformat = '%d-%m-%y',
+        xaxis_showgrid=False,
+        yaxis_showgrid=False
+    )
+
+    return fig
+
+
+line_confirmed = line_cases(df_confirmed, 'Casos confirmados diarios por pais')
+line_recovered = line_cases(df_recovered, 'Pacientes recuperados diarios por pais')
+line_deaths = line_cases(df_muertes, "Fallecidos diarios por pais")
+
 ###########
 #DASHBOARD#
 ###########
@@ -135,15 +166,16 @@ with map2:
 
 with map3:
     st.subheader("Muertes")
-    st.plotly_chart(map_acum_deaths, use_container_width=True, color_bg='#0E1136')
+    st.plotly_chart(map_acum_deaths, use_container_width=True)
 
 ##### DE LINEAS #####
 
-fig2 = px.line(
-    x=df_muertes.date,
-    y=df_muertes.value,
-    color = df_muertes.country_region,
-    markers=True
-    )
 
-st.plotly_chart(fig2, use_container_width=True)
+with st.expander("Confirmados"):
+    st.plotly_chart(line_confirmed, use_container_width=True)
+
+with st.expander("Recuperados"):
+    st.plotly_chart(line_recovered, use_container_width=True)
+
+with st.expander("Fallecidos"):
+    st.plotly_chart(line_deaths, use_container_width=True)
