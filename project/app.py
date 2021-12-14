@@ -82,6 +82,15 @@ df_recovered_acum['Text'] =  "<b>Pais</b>: " + df_recovered_acum['country_region
                             "<br><b>Estado</b>: " + df_recovered_acum['province_state'] + \
                            '<br><b>Casos recuperados</b>:' + (df_recovered_acum['value']).astype(str)
 
+
+######################################
+### Preparando datos para metricas ###
+######################################
+
+#mtc_deaths_ld = df_muertes.where(datetime(df_muertes['date']) >= fecha2)
+#mtc_recovered_ld = df_recovered[[df_recovered.date == fecha2]]
+#mtc_confirmed_ld = df_confirmed[[df_confirmed.date == fecha2]]
+
 ### Mapa acumuladas del filtro ###
 
 def mapa_acumulado_filtro(df, scale=100, color='#ff0000'):
@@ -151,6 +160,40 @@ line_deaths = line_cases(df_muertes, "Fallecidos diarios por pais")
 ###########
 #DASHBOARD#
 ###########
+
+##### METRICS #####
+
+
+metrics = st.container()
+
+m1, m2, m3, m4 = metrics.columns(4)
+
+with m1:
+    st.metric(
+        label='Paises',
+        value=len(country)
+    )
+
+with m2:
+    st.metric(
+        label='Fallecidos en el periodo',
+        value=sum(df_muertes_acum['value'])
+        #delta= sum(mtc_deaths_ld['value']),
+        #delta_color= 'inverse'
+    )
+
+with m3:
+    st.metric(
+        label='Casos confirmados en el periodo',
+        value=len(country)
+    )
+
+with m4:
+    st.metric(
+        label='Paises',
+        value=len(country)
+    )
+
 
 ##### MAPAS #####
 
