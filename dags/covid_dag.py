@@ -18,10 +18,12 @@ COLUMNS = {
     "Lat"            : "lat", 
     "Long"           : "lon", 
     "Date"           : "date", 
-    "Value"          : "value",
-    "Status"         : "status",
+    "Confirmed"      : "confirmed",
+    "Deaths"         : "deaths",
+    "Recovered"      : "recovered",
     "Created_at"     : "created_at"
 }
+
 
 
 dag = DAG('covid_dag', description='Covid 19 data insert and preprocess flow',
@@ -35,46 +37,6 @@ dag = DAG('covid_dag', description='Covid 19 data insert and preprocess flow',
           catchup=False)
 
 
-def data_preprocessing(df, file):
-    """
-    Convert date columns to rows with their values
-    """
-    
-    columns = ['Province/State','Country/Region','Lat','Long']
-    
-    df['Province/State'].fillna('Unknown', inplace = True)
-    df['Lat'].fillna(0.0000, inplace = True)
-    df['Long'].fillna(0.0000, inplace = True)
-    
-    dates = df.drop(columns=columns)
-    dates = dates.diff(axis=1)
-    dates.fillna(0, inplace = True)
-    
-    df.drop(columns=df.columns.difference(columns), inplace = True)
-    
-    df_concat = pd.concat([df,dates], axis=1)
-    
-    df_concat = df_concat.melt(id_vars=columns, var_name="Date", value_name="Value")
-    
-    status = "Unkown"
-
-    if("confirmed" in file):
-        status = "Confirmed"
-    elif("deaths" in file):
-        status = "Deaths"
-    elif("recovered" in file):
-        status = "Recovered"
-        
-    df_concat["Status"] = status
-    df_concat["Created_at"] = datetime.now()
-
-    df_concat.rename(columns=COLUMNS, inplace=True)
-
-    df_concat.date = pd.to_datetime(df_concat.date)
-
-    return df_concat
-
-
 def sensor_data(**kwargs):
     
     execution_date = kwargs["execution_date"]
@@ -84,26 +46,53 @@ def sensor_data(**kwargs):
     connection = MySqlHook('mysql_default').get_sqlalchemy_engine()
 
     files = [file for file in os.listdir(file_path)]
-    for file in files:
-        df = pd.read_csv(file_path+file, encoding="ISO-8859-1")
-        df = data_preprocessing(df, file)
-        logger.info(df)
+    
+    df1 = pd.read_csv(file_path+files[0], encoding="ISO-8859-1")
+    df2 = pd.read_csv(file_path+files[1], encoding="ISO-8859-1")
+    df3 = pd.read_csv(file_path+files[2], encoding="ISO-8859-1")
 
-        status = ""
+    columns = ['Province/State','Country/Region','Lat','Long']
 
-        if("confirmed" in file):
-            status = "Confirmed"
-        elif("deaths" in file):
-            status = "Deaths"
-        elif("recovered" in file):
-            status = "Recovered"
+    ## Melt de los 3 datasets
+    confirmed = df1.melt(id_vars=columns, var_name="Date", value_name="Confirmed")
+    deaths = df2.melt(id_vars=columns, var_name="Date", value_name="Deaths")
+    recovered = df3.melt(id_vars=columns, var_name="Date", value_name="Recovered")
 
-        with connection.begin() as transaction:
-            transaction.execute(f"DELETE FROM db_covid.covid_values WHERE db_covid.covid_values.status = '{status}'")
-            df.to_sql('covid_values', con = transaction, schema='db_covid',  if_exists = 'append', index = False)
+    ## Union en un solo dataset
+    full_data = confirmed.merge(right=deaths, how='left', on=['Province/State', 'Country/Region', 'Date', 'Lat', 'Long'])
+    full_data = full_data.merge(right=recovered, how='left', on=['Province/State', 'Country/Region', 'Date', 'Lat', 'Long'])
+    
+    ## DateTime
+    full_data['Date'] = pd.to_datetime(full_data['Date'])
 
-        logger.info(f'Records inserted {len(df.index)} --- {file}')
-        os.remove(file_path+file)
+    ## NaN values
+    full_data['Recovered'].fillna(0, inplace = True)
+    full_data['Lat'].fillna(0.0000, inplace = True)
+    full_data['Long'].fillna(0.0000, inplace = True)
+    full_data['Province/State'].fillna('Unknown', inplace = True)
+    
+    ## Reversion de sumarizado
+    group_data = full_data.groupby(['Province/State', 'Country/Region', 'Lat', 'Long', 'Date'])['Confirmed', 'Deaths', 'Recovered'].sum().reset_index()
+    temp = group_data.groupby(['Province/State', 'Country/Region', 'Lat', 'Long', 'Date']) ['Confirmed', 'Deaths', 'Recovered'] 
+    temp =temp.sum().diff().reset_index()
+    
+    ## NaN values
+    temp.fillna(0, inplace = True)
+    
+    ## Finalizando
+    temp["Created_at"] = datetime.now()
+    temp.rename(columns=COLUMNS, inplace=True)
+    temp[['confirmed', 'deaths', 'recovered']] = temp[['confirmed', 'deaths', 'recovered']].applymap(lambda x: 0 if x < 0 else x)
+
+    with connection.begin() as transaction:
+        transaction.execute(f"TRUNCATE TABLE db_covid.covid_values")
+        temp.to_sql('covid_values', con = transaction, schema='db_covid',  if_exists = 'append', index = False)
+
+    logger.info(f'Records inserted {len(temp.index)}')
+
+    os.remove(file_path+files[0])
+    os.remove(file_path+files[1])
+    os.remove(file_path+files[2])
 
 
 

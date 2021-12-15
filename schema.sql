@@ -5,8 +5,9 @@ CREATE TABLE db_covid.covid_values(
     lat decimal(9,6),
     lon decimal(9,6),
     date date,
-    value int,
-    status varchar(15),
+    confirmed int,
+    deaths int,
+    recovered int,
     created_at datetime,
     PRIMARY KEY (id)
 );

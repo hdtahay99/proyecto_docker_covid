@@ -9,8 +9,9 @@ class CovidValueBase(BaseModel):
     lat            : float
     lon            : float
     date           : date
-    value          : int
-    status         : str
+    confirmed      : int
+    deaths         : int
+    recovered      : int
 
 
 

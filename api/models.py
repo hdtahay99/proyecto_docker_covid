@@ -12,8 +12,9 @@ class CovidValue(Base):
     lat            = Column(Float)
     lon            = Column(Float)
     date           = Column(Date)
-    value          = Column(Integer)
-    status         = Column(String)
+    confirmed      = Column(Integer)
+    deaths         = Column(Integer)
+    recovered      = Column(Integer)
     created_at     = Column(DateTime)
 
 

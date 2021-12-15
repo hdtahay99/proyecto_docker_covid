@@ -24,15 +24,11 @@ def get_covid_values(skip = 0, limit = 100):
     response = requests.get(url = f"http://fastapi:8585/covid/values?skip={skip}&limit={limit}")
     return response.json()
 
-def get_covid_filter(skip = 0, limit = 100, status = 'Deaths'):
-    response = requests.get(url = f"http://fastapi:8585/covid/values/filter?skip={skip}&limit={limit}&status={status}")
+def get_covid_filter2(date_from: date, date_to: date):
+    response = requests.get(url = f"http://fastapi:8585/covid/values/test2?date_from={date_from}&date_to={date_to}")
     return response.json()
 
-def get_covid_filter2(date_from: date,date_to: date, status: str = 'Deaths'):
-    response = requests.get(url = f"http://fastapi:8585/covid/values/test2?date_from={date_from}&date_to={date_to}&status={status}")
-    return response.json()
-
-countries = df_confirmed = pd.DataFrame.from_records(get_covid_filter2(fecha1, fecha2, 'Confirmed')).reset_index()['country_region'].to_list()
+countries = df_confirmed = pd.DataFrame.from_records(get_covid_filter2(fecha1, fecha2)).reset_index()['country_region'].to_list()
 countries = set(countries)
 countries = list(countries)
 
@@ -45,17 +41,26 @@ country = st.sidebar.multiselect("Selecciona un país",countries, default=defaul
 ### Capturando datos ###
 ########################
 
+full_data = pd.DataFrame.from_records(get_covid_filter2(fecha1, fecha2)).reset_index()
+
 #### Muertes
-df_muertes = pd.DataFrame.from_records(get_covid_filter2(fecha1, fecha2, 'Deaths')).reset_index()
-df_muertes = df_muertes[df_muertes.country_region.isin(country)]
+#df_muertes = pd.DataFrame.from_records(get_covid_filter2(fecha1, fecha2)).reset_index()
+#df_muertes = df_muertes[df_muertes.country_region.isin(country)]
+
+df_muertes = full_data[full_data.country_region.isin(country)]
 
 #### Confirmados
-df_confirmed = pd.DataFrame.from_records(get_covid_filter2(fecha1, fecha2, 'Confirmed')).reset_index()
-df_confirmed = df_confirmed[df_confirmed.country_region.isin(country)]
+#df_confirmed = pd.DataFrame.from_records(get_covid_filter2(fecha1, fecha2)).reset_index()
+#df_confirmed = df_confirmed[df_confirmed.country_region.isin(country)]
+
+df_confirmed = full_data[full_data.country_region.isin(country)]
 
 #### Recuperados
-df_recovered = pd.DataFrame.from_records(get_covid_filter2(fecha1, fecha2, 'Recovered')).reset_index()
-df_recovered = df_recovered[df_recovered.country_region.isin(country)]
+#df_recovered = pd.DataFrame.from_records(get_covid_filter2(fecha1, fecha2)).reset_index()
+#df_recovered = df_recovered[df_recovered.country_region.isin(country)]
+
+df_recovered = full_data[full_data.country_region.isin(country)]
+
 
 ###################################
 ### Preparando datos para mapas ###
@@ -65,13 +70,13 @@ df_recovered = df_recovered[df_recovered.country_region.isin(country)]
 df_muertes_acum =df_muertes.groupby(by=['country_region','province_state','lat','lon']).sum().reset_index()
 df_muertes_acum['Text'] =  "Pais: " + df_muertes_acum['country_region'] + \
                             "<br>Estado: " + df_muertes_acum['province_state'] + \
-                           '<br>Fallecidos:' + (df_muertes_acum['value']).astype(str)
+                           '<br>Fallecidos:' + (df_muertes_acum['deaths']).astype(str)
 
 #### Confirmados
 df_confirmed_acum =df_confirmed.groupby(by=['country_region','province_state','lat','lon']).sum().reset_index()
 df_confirmed_acum['Text'] =  "Pais: " + df_confirmed_acum['country_region'] + \
                             "<br>Estado: " + df_confirmed_acum['province_state'] + \
-                           '<br>Casos confirmados:' + (df_confirmed_acum['value']).astype(str)
+                           '<br>Casos confirmados:' + (df_confirmed_acum['confirmed']).astype(str)
 
 #### Recuperados
 df_recovered_acum =df_recovered.groupby(by=['country_region','province_state','lat','lon']).sum().reset_index()
@@ -80,7 +85,7 @@ df_recovered_acum =df_recovered.groupby(by=['country_region','province_state','l
 
 df_recovered_acum['Text'] =  "<b>Pais</b>: " + df_recovered_acum['country_region'] + \
                             "<br><b>Estado</b>: " + df_recovered_acum['province_state'] + \
-                           '<br><b>Casos recuperados</b>:' + (df_recovered_acum['value']).astype(str)
+                           '<br><b>Casos recuperados</b>:' + (df_recovered_acum['recovered']).astype(str)
 
 
 ######################################
@@ -93,14 +98,14 @@ df_recovered_acum['Text'] =  "<b>Pais</b>: " + df_recovered_acum['country_region
 
 ### Mapa acumuladas del filtro ###
 
-def mapa_acumulado_filtro(df, scale=100, color='#ff0000'):
+def mapa_acumulado_filtro(df, scale=100, color='#ff0000', val='confirmed'):
     fig = go.Figure(go.Scattergeo())
     fig.add_trace(go.Scattergeo(
         lon=df['lon'],
         lat=df['lat'],
         text=df['Text'],
         marker=dict(
-            size=df['value']/scale,
+            size=df[val]/scale,
             color=color,
             line_width=0.5,
             sizemode='area'
@@ -123,18 +128,18 @@ def mapa_acumulado_filtro(df, scale=100, color='#ff0000'):
 
     return  fig
 
-map_acum_confirmed = mapa_acumulado_filtro(df_confirmed_acum, scale = 1000, color = '#FF7D33')
-map_acum_recovered = mapa_acumulado_filtro(df_recovered_acum, scale = 1000, color = '#338BFF')
-map_acum_deaths = mapa_acumulado_filtro(df_muertes_acum, scale = 10, color = '#FF3333')
+map_acum_confirmed = mapa_acumulado_filtro(df_confirmed_acum, scale = 1000, color = '#FF7D33', val='confirmed')
+map_acum_recovered = mapa_acumulado_filtro(df_recovered_acum, scale = 1000, color = '#338BFF', val='recovered')
+map_acum_deaths = mapa_acumulado_filtro(df_muertes_acum, scale = 10, color = '#FF3333', val='deaths')
 
 
-def line_cases(df, status ='Casos'):
+def line_cases(df, status ='Casos', val='confirmed'):
     fig = go.Figure()
 
     for country_region, group in df.groupby("country_region"):
         fig.add_trace(go.Scatter(
             x = group['date'],
-            y = group['value'],
+            y = group[val],
             mode = 'lines',
             name = country_region
         ))
@@ -153,9 +158,9 @@ def line_cases(df, status ='Casos'):
     return fig
 
 
-line_confirmed = line_cases(df_confirmed, 'Casos confirmados diarios por pais')
-line_recovered = line_cases(df_recovered, 'Pacientes recuperados diarios por pais')
-line_deaths = line_cases(df_muertes, "Fallecidos diarios por pais")
+line_confirmed = line_cases(df_confirmed, 'Casos confirmados diarios por pais', 'confirmed')
+line_recovered = line_cases(df_recovered, 'Pacientes recuperados diarios por pais', 'recovered')
+line_deaths = line_cases(df_muertes, "Fallecidos diarios por pais", 'deaths')
 
 ###########
 #DASHBOARD#
@@ -177,7 +182,7 @@ with m1:
 with m2:
     st.metric(
         label='Fallecidos en el periodo',
-        value=sum(df_muertes_acum['value'])
+        value=sum(df_muertes_acum['deaths'])
         #delta= sum(mtc_deaths_ld['value']),
         #delta_color= 'inverse'
     )
