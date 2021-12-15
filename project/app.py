@@ -222,3 +222,5 @@ with st.expander("Recuperados"):
 
 with st.expander("Fallecidos"):
     st.plotly_chart(line_deaths, use_container_width=True)
+
+##### DE LINEAS #####
