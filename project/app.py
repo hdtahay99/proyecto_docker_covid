@@ -13,12 +13,18 @@ st.set_page_config(layout='wide')
 ###########
 fecha1 = st.sidebar.date_input("Fecha inicial",
                                date(2021, 3, 1),
-
+                               min_value=date(2019, 12, 1),
+                               max_value=date.today()
                                )
 fecha2 = st.sidebar.date_input("Fecha final",
-                               date(2021, 6, 30)
+                               date(2021, 6, 30),
+                               min_value=date(2019, 12, 1),
+                               max_value=date.today()
                                )
-components.html("<center> <h1>COVID 19 en el mundo</h1></center><br><center><b>Casos acumulados entre el "+ str(fecha1)  +" y el "+ str(fecha2) +"</b></center>")
+
+st.markdown("# COVID 19 en el mundo")
+st.markdown("## Casos acumulados entre el "+ str(fecha1)  +" y el "+ str(fecha2))
+
 
 def get_covid_values(skip = 0, limit = 100):
     response = requests.get(url = f"http://fastapi:8585/covid/values?skip={skip}&limit={limit}")
@@ -124,7 +130,7 @@ map_acum_recovered = mapa_acumulado_filtro(df_recovered_acum, scale = 1000, colo
 map_acum_deaths = mapa_acumulado_filtro(df_muertes_acum, scale = 10, color = '#FF3333', val='deaths')
 
 
-def line_cases(df, status ='Casos', val='confirmed'):
+def line_cases(df,title="Nuevos", status ='Casos', val='confirmed'):
     fig = go.Figure()
 
     for country_region, group in df.groupby("country_region"):
@@ -139,7 +145,7 @@ def line_cases(df, status ='Casos', val='confirmed'):
     fig.update_layout(
         paper_bgcolor = '#F3F5F9',
         plot_bgcolor='rgba(0,0,0,0)',
-        title_text=status, title_x=0.5, title_font_size=24,
+        title_text=title, title_x=0.5, title_font_size=24,
         xaxis_title="Fecha",
         yaxis_title="Casos",
         xaxis_tickformat = '%d-%m-%y',
@@ -150,14 +156,14 @@ def line_cases(df, status ='Casos', val='confirmed'):
     return fig
 
 ## Data diaria
-line_confirmed = line_cases(df_confirmed, 'Casos confirmados', 'confirmed')
-line_recovered = line_cases(df_recovered, 'Pacientes recuperados', 'recovered')
-line_deaths = line_cases(df_muertes, "Fallecidos", 'deaths')
+line_confirmed = line_cases(df_confirmed,"Nuevos" ,'Casos confirmados', 'confirmed')
+line_recovered = line_cases(df_recovered, "Nuevos",'Pacientes recuperados', 'recovered')
+line_deaths = line_cases(df_muertes, "Nuevos" ,"Fallecidos", 'deaths')
 
 ## Data acumulada
-cumsum_line_confirmed = line_cases(cumsum_confirmed, 'Casos confirmados', 'confirmed')
-cumsum_line_recovered = line_cases(cumsum_confirmed, 'Casos recuperados', 'recovered')
-cumsum_line_deaths = line_cases(cumsum_death, 'Fallecidos', 'deaths')
+cumsum_line_confirmed = line_cases(cumsum_confirmed,"Acumulados" , 'Casos confirmados', 'confirmed')
+cumsum_line_recovered = line_cases(cumsum_confirmed, "Acumulados" ,'Casos recuperados', 'recovered')
+cumsum_line_deaths = line_cases(cumsum_death, "Acumulados",'Fallecidos', 'deaths')
 
 ###########
 #DASHBOARD#
@@ -197,49 +203,47 @@ with m4:
         #delta_color= 'inverse'
     )
 
-
-
-
 ##### MAPAS #####
 
 map1, map2, map3 = st.columns(3)
 
 with map1:
-    st.subheader("Confirmados")
+    st.markdown("#### Confirmados")
     st.plotly_chart(map_acum_confirmed, use_container_width=True)
 
 with map2:
-    st.subheader("Recuperados")
+    st.markdown("#### Recuperados")
     st.plotly_chart(map_acum_recovered, use_container_width=True)
 
 with map3:
-    st.subheader("Muertes")
+    st.markdown("#### Muertes")
     st.plotly_chart(map_acum_deaths, use_container_width=True)
 
 ##### DE LINEAS #####
+###### Confirmados
 
+st.markdown("#### Casos confirmados en el periodo")
 conf1, conf2 = st.columns(2)
-rec1, rec2 = st.columns(2)
-dead1, dead2 = st.columns(2)
-
-### Confirmados
-
 with conf1:
     st.plotly_chart(line_confirmed, use_container_width=True)
 
 with conf2:
     st.plotly_chart(cumsum_line_confirmed, use_container_width=True)
 
-#### Recuperados
+###### Recuperados
 
+st.markdown("#### Casos recuperados en el periodo")
+rec1, rec2 = st.columns(2)
 with rec1:
     st.plotly_chart(line_recovered, use_container_width=True)
 
 with rec2:
     st.plotly_chart(cumsum_line_recovered, use_container_width=True)
 
-##### Fallecidos
+###### Fallecidos
 
+st.markdown("#### Fallecidos en el periodo")
+dead1, dead2 = st.columns(2)
 with dead1:
     st.plotly_chart(line_deaths, use_container_width=True)
 
@@ -247,3 +251,29 @@ with dead2:
     st.plotly_chart(cumsum_line_deaths, use_container_width=True)
 
 ##### Tablas
+
+st.markdown("### Comparativo entre países seleccionados")
+st.markdown("##### Acumulados entre el "+ str(fecha1)  +" y el "+ str(fecha2))
+
+
+t1 = df_confirmed_acum[[ 'country_region', 'confirmed']].groupby('country_region').sum().sort_values(by='confirmed', ascending=False).reset_index()
+t1.columns = ['País', 'Confirmados']
+t1.Confirmados = t1.Confirmados .map('{:,}'.format)
+
+t2 = df_recovered_acum[[ 'country_region', 'recovered']].groupby('country_region').sum().sort_values(by='recovered', ascending=False).reset_index()
+t2.columns = ['País', 'Recuperados']
+t2.Recuperados = t2.Recuperados .map('{:,}'.format)
+
+t3 = df_muertes_acum[[ 'country_region', 'deaths']].groupby('country_region').sum().sort_values(by='deaths', ascending=False).reset_index()
+t3.columns = ['País', 'Fallecidos']
+t3.Fallecidos = t3.Fallecidos .map('{:,}'.format)
+
+tab1, tab2, tab3 = st.columns(3)
+with tab1:
+    st.dataframe(t1)
+
+with tab2:
+    st.dataframe(t2)
+
+with tab3:
+    st.dataframe(t3)
