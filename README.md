@@ -1,5 +1,7 @@
 ![Airflow Dashboard](./images/GalileoLogo.jpg)
 
+<img src="https://github.com/images/GalileoLogo.jpg" width="48">
+
 # Proyecto Final - Covid 19 Dashboard
 
 ### Integrantes
