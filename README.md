@@ -8,7 +8,7 @@
 * Edi Antonio Ordoñez Hernández - 9912628
 * Tomás Ernesto Esquivel Ramos - 21004407
 
-#### **Link de la aplicación en Shinyapps.io** 
+
 
 ## App sobre Estadísticas de Covid 19
 
