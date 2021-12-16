@@ -13,8 +13,8 @@
 ## App sobre Estadísticas de Covid 19 🚀
 
 <hr/>
+## Estructura del proyecto 🖥️
 
-Estructura del proyecto:
 ```
 root
 |
@@ -87,7 +87,7 @@ En caso solo se necesite un servicio, únicamente se le tiene que agregar el nom
 
 <hr/>
 
-## Pipeline Dag en Airflow 🔧
+## Pipeline Dag en Airflow 🛠️
 
 La carpeta llamada "data", dentro de la estructura del proyecto, tendrá contenida los siguientes archivos csv:
 
@@ -156,4 +156,4 @@ Lo anterior debería activar el pipeline de activación de preprocesamiento de l
 
 ![Airflow Dashboard](./images/on-dag.png)
 
-## Streamlit Dashboard 🔩
+## Streamlit Dashboard 📖
