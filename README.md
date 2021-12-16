@@ -10,7 +10,7 @@
 
 
 
-## App sobre Estadísticas de Covid 19
+## App sobre Estadísticas de Covid 19 🚀
 
 <hr/>
 
@@ -61,6 +61,7 @@ root
 |____schema.sql      
 
 ```
+## Comandos 📋
 
 Para levantar el ambiente de docker, es necesario ejecutar los siguientes comandos:
 
@@ -86,7 +87,7 @@ En caso solo se necesite un servicio, únicamente se le tiene que agregar el nom
 
 <hr/>
 
-## Pipeline Dag en Airflow
+## Pipeline Dag en Airflow 🔧
 
 La carpeta llamada "data", dentro de la estructura del proyecto, tendrá contenida los siguientes archivos csv:
 
@@ -140,7 +141,7 @@ De lo anterior se tomaron los siguientes parámetros configurados en el servicio
 - Port <=> 'PORT_DOCKER_SERVICE'
 ```
 
-## Ejecución del Dag
+## Ejecución del Dag 📦
 
 Posterior a los pasos realizados anteriormente, para activar el dag, es necesario copiar toda la carpeta "data" a la carpeta "monitor" de la estructura del proyecto, tal como lo siguiente:
 
