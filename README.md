@@ -1,4 +1,4 @@
-<img src="./images/logo-ug.png" width="300">
+<img src="./images/GalileoLogo.jpg" width="300">
 
 # Proyecto Final - Covid 19 Dashboard
 
