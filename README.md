@@ -1,6 +1,6 @@
 ![Airflow Dashboard](./images/GalileoLogo.jpg)
 
-<img src="https://github.com/images/GalileoLogo.jpg" width="48">
+<img src="https://github.com/hdtahay99/proyecto_docker_covid/tree/main/images/GalileoLogo.jpg" width="48">
 
 # Proyecto Final - Covid 19 Dashboard
 
