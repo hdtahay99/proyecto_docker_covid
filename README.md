@@ -13,6 +13,7 @@
 ## App sobre Estadísticas de Covid 19 🚀
 
 <hr/>
+
 ## Estructura del proyecto 🖥️
 
 ```
