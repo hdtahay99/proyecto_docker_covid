@@ -1,3 +1,5 @@
+![Airflow Dashboard](./images/GalileoLogo.jpg)
+
 ## App sobre Estadísticas de Covid 19
 
 <hr/>
