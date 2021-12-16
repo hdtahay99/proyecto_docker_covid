@@ -156,4 +156,4 @@ Lo anterior debería activar el pipeline de activación de preprocesamiento de l
 
 ![Airflow Dashboard](./images/on-dag.png)
 
-## Streamlit Dashboard
+## Streamlit Dashboard 🔩
