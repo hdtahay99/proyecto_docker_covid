@@ -3,7 +3,6 @@ import requests
 import pandas as pd
 from datetime import date, datetime
 import streamlit.components.v1 as components
-import plotly.express as px
 import plotly.graph_objects as go
 
 st.set_page_config(layout='wide')
@@ -57,6 +56,7 @@ df_confirmed = full_data[full_data.country_region.isin(country)]
 
 #### Recuperados
 df_recovered = full_data[full_data.country_region.isin(country)]
+
 
 
 ###################################
@@ -127,7 +127,7 @@ def mapa_acumulado_filtro(df, scale=100, color='#ff0000', val='confirmed'):
 
 map_acum_confirmed = mapa_acumulado_filtro(df_confirmed_acum, scale = 1000, color = '#FF7D33', val='confirmed')
 map_acum_recovered = mapa_acumulado_filtro(df_recovered_acum, scale = 1000, color = '#338BFF', val='recovered')
-map_acum_deaths = mapa_acumulado_filtro(df_muertes_acum, scale = 10, color = '#FF3333', val='deaths')
+map_acum_deaths = mapa_acumulado_filtro(df_muertes_acum, scale = 100, color = '#FF3333', val='deaths')
 
 
 def line_cases(df,title="Nuevos", status ='Casos', val='confirmed'):
@@ -164,6 +164,36 @@ line_deaths = line_cases(df_muertes, "Nuevos" ,"Fallecidos", 'deaths')
 cumsum_line_confirmed = line_cases(cumsum_confirmed,"Acumulados" , 'Casos confirmados', 'confirmed')
 cumsum_line_recovered = line_cases(cumsum_confirmed, "Acumulados" ,'Casos recuperados', 'recovered')
 cumsum_line_deaths = line_cases(cumsum_death, "Acumulados",'Fallecidos', 'deaths')
+
+#### Procesamiento de datos para tablas acumuladas
+t1 = df_confirmed_acum[[ 'country_region', 'confirmed']].groupby('country_region').sum().sort_values(by='confirmed', ascending=False).reset_index()
+t1.columns = ['País', 'Confirmados']
+t1.Confirmados = t1.Confirmados .map('{:,}'.format)
+
+t2 = df_recovered_acum[[ 'country_region', 'recovered']].groupby('country_region').sum().sort_values(by='recovered', ascending=False).reset_index()
+t2.columns = ['País', 'Recuperados']
+t2.Recuperados = t2.Recuperados .map('{:,}'.format)
+
+t3 = df_muertes_acum[[ 'country_region', 'deaths']].groupby('country_region').sum().sort_values(by='deaths', ascending=False).reset_index()
+t3.columns = ['País', 'Fallecidos']
+t3.Fallecidos = t3.Fallecidos .map('{:,}'.format)
+
+full_data_ld = pd.DataFrame.from_records(get_covid_filter2(fecha2, fecha2)).reset_index()
+full_data_ld = full_data_ld[full_data_ld.country_region.isin(country)]
+
+#### Data del último día
+
+tn1 = full_data_ld.groupby('country_region').sum().reset_index()[['country_region', 'confirmed']].sort_values(by='confirmed', ascending=False)
+tn1.columns = ['País', 'Confirmados']
+tn1.Confirmados = tn1.Confirmados.map('{:,}'.format)
+
+tn2 = full_data_ld.groupby('country_region').sum().reset_index()[['country_region', 'recovered']].sort_values(by='recovered', ascending=False)
+tn2.columns = ['País', 'Recuperados']
+tn2.Recuperados = tn2.Recuperados.map('{:,}'.format)
+
+tn3 = full_data_ld.groupby('country_region').sum().reset_index()[['country_region', 'deaths']].sort_values(by='deaths', ascending=False)
+tn3.columns = ['País', 'Fallecidos']
+tn3.Fallecidos = tn3.Fallecidos.map('{:,}'.format)
 
 ###########
 #DASHBOARD#
@@ -253,27 +283,33 @@ with dead2:
 ##### Tablas
 
 st.markdown("### Comparativo entre países seleccionados")
-st.markdown("##### Acumulados entre el "+ str(fecha1)  +" y el "+ str(fecha2))
-
-
-t1 = df_confirmed_acum[[ 'country_region', 'confirmed']].groupby('country_region').sum().sort_values(by='confirmed', ascending=False).reset_index()
-t1.columns = ['País', 'Confirmados']
-t1.Confirmados = t1.Confirmados .map('{:,}'.format)
-
-t2 = df_recovered_acum[[ 'country_region', 'recovered']].groupby('country_region').sum().sort_values(by='recovered', ascending=False).reset_index()
-t2.columns = ['País', 'Recuperados']
-t2.Recuperados = t2.Recuperados .map('{:,}'.format)
-
-t3 = df_muertes_acum[[ 'country_region', 'deaths']].groupby('country_region').sum().sort_values(by='deaths', ascending=False).reset_index()
-t3.columns = ['País', 'Fallecidos']
-t3.Fallecidos = t3.Fallecidos .map('{:,}'.format)
+st.markdown("#### Ranking de países -  Acumulados entre el "+ str(fecha1)  +" y el "+ str(fecha2))
 
 tab1, tab2, tab3 = st.columns(3)
 with tab1:
+    st.markdown("###### Confirmados")
     st.dataframe(t1)
 
 with tab2:
+    st.markdown("###### Recuperados")
     st.dataframe(t2)
 
 with tab3:
+    st.markdown("###### Fallecidos")
     st.dataframe(t3)
+
+
+st.markdown("#### Ranking de países - Nuevos casos para la fecha " + str(fecha2))
+
+tabn1, tabn2, tabn3 = st.columns(3)
+with tabn1:
+    st.markdown("###### Confirmados")
+    st.dataframe(tn1)
+
+with tabn2:
+    st.markdown("###### Recuperados")
+    st.dataframe(tn2)
+
+with tabn3:
+    st.markdown("###### Fallecidos")
+    st.dataframe(tn3)
