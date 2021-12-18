@@ -167,3 +167,8 @@ Se creo un mapa que muestre por código de colores de burbujas que muestra la to
 
 ![Airflow Dashboard](./images/Mapas.png)
 
+### Estadisticas
+
+* Estadísticas de los acumulados por país, clasificándolos por: Confirmados, Recuperados y Fallecidos.
+*Estadísticas de los casos nuevos por rango de fechas, clasificados por: Confirmados, Recuperados y Fallecidos.
+
