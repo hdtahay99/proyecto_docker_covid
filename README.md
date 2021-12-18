@@ -62,6 +62,8 @@ root
 |____schema.sql      
 
 ```
+<p align="right">(<a href="#top">back to top</a>)</p>
+
 ## Comandos 📋
 
 Para levantar el ambiente de docker, es necesario ejecutar los siguientes comandos:
@@ -87,6 +89,7 @@ En caso solo se necesite un servicio, únicamente se le tiene que agregar el nom
 ```
 
 <hr/>
+<p align="right">(<a href="#top">back to top</a>)</p>
 
 ## Pipeline Dag en Airflow 🛠️
 
@@ -141,6 +144,7 @@ De lo anterior se tomaron los siguientes parámetros configurados en el servicio
 - Password <=> 'MYSQL_PASSWORD'
 - Port <=> 'PORT_DOCKER_SERVICE'
 ```
+<p align="right">(<a href="#top">back to top</a>)</p>
 
 ## Ejecución del Dag 📦
 
@@ -157,6 +161,8 @@ Lo anterior debería activar el pipeline de activación de preprocesamiento de l
 
 ![Airflow Dashboard](./images/on-dag.png)
 
+<p align="right">(<a href="#top">back to top</a>)</p>
+
 ## Streamlit Dashboard 📖
 
 ### Mapa
@@ -167,12 +173,16 @@ Se creo un mapa que muestre por código de colores de burbujas que muestra la to
 
 ![Airflow Dashboard](./images/Mapas.png)
 
+<p align="right">(<a href="#top">back to top</a>)</p>
+
 ### Estadísticas
 
 * Estadísticas de los acumulados por país, clasificándolos por: Confirmados, Recuperados y Fallecidos.
 * Estadísticas de los casos nuevos por rango de fechas, clasificados por: Confirmados, Recuperados y Fallecidos.
 
 ![Airflow Dashboard](./images/Comparativo.png)
+
+<p align="right">(<a href="#top">back to top</a>)</p>
 
 ### Estadísticas Adicionales
 
@@ -184,3 +194,5 @@ Se creo un mapa que muestre por código de colores de burbujas que muestra la to
 * Estadísticas de personas fallecidas en un rango especifico de fechas y países, estos se muestran en graficas comparativas en el cual se cuentan los casos en rango de fechas y se comparan entre los diferentes países, la primera grafica muestra los nuevos casos y la segunda muestra el acumulado de casos.
 
 ![Airflow Dashboard](./images/Fallecidos.png)
+
+<p align="right">(<a href="#top">back to top</a>)</p>
