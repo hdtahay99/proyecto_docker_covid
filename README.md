@@ -167,9 +167,20 @@ Se creo un mapa que muestre por código de colores de burbujas que muestra la to
 
 ![Airflow Dashboard](./images/Mapas.png)
 
-### Estadisticas
+### Estadísticas
 
 * Estadísticas de los acumulados por país, clasificándolos por: Confirmados, Recuperados y Fallecidos.
 * Estadísticas de los casos nuevos por rango de fechas, clasificados por: Confirmados, Recuperados y Fallecidos.
 
 ![Airflow Dashboard](./images/Comparativo.png)
+
+### Estadísticas Adicionales
+
+* Estadísticas de personas recuperadas en un rango especifico de fechas y países, estos se muestran en graficas comparativas en el cual se cuentan los casos en rango de fechas y se comparan entre los diferentes países, la primera grafica muestra los nuevos casos y la segunda muestra el acumulado de casos.
+
+
+![Airflow Dashboard](./images/Recuperados.png)
+
+* Estadísticas de personas fallecidas en un rango especifico de fechas y países, estos se muestran en graficas comparativas en el cual se cuentan los casos en rango de fechas y se comparan entre los diferentes países, la primera grafica muestra los nuevos casos y la segunda muestra el acumulado de casos.
+
+![Airflow Dashboard](./images/Fallecidos.png)
