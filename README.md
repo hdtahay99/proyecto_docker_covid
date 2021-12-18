@@ -158,3 +158,12 @@ Lo anterior debería activar el pipeline de activación de preprocesamiento de l
 ![Airflow Dashboard](./images/on-dag.png)
 
 ## Streamlit Dashboard 📖
+
+### Mapa
+
+El dashboard fue diseñado con Streamlit, por compatibilidad con la funcionalidad y utilizar Python en todo el desarrollo de la aplicación.
+
+Se creo un mapa que muestre por código de colores de burbujas que muestra la totalidad de los casos, recuperaciones y muertes para una fecha dada y un país determinado.
+
+![Airflow Dashboard](./images/Mapas.png)
+
