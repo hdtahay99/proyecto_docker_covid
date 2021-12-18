@@ -3,10 +3,10 @@
 # Proyecto Final - Covid 19 Dashboard
 
 ### Integrantes
-* Ramón Alberto Escobar Madrid - 21001346 - [GitHub](https://github.com/eesquivel5)
-* Heansell Diosymar Tahay Menchú - 20005256
-* Edi Antonio Ordoñez Hernández - 9912628
-* Tomás Ernesto Esquivel Ramos - 21004407
+* Ramón Alberto Escobar Madrid - 21001346 - [@ramonescobar](https://github.com/ramonescobar)
+* Heansell Diosymar Tahay Menchú - 20005256 - [@hdtahay99](https://github.com/hdtahay99)
+* Edi Antonio Ordoñez Hernández - 9912628 - [@EdiAOHernandez](https://github.com/EdiAOHernandez )
+* Tomás Ernesto Esquivel Ramos - 21004407 - [@eesquivel5](https://github.com/eesquivel5)
 
 
 
